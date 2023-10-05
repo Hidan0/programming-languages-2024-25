@@ -1,0 +1,13 @@
+(lang dune 3.10)
+
+(name ocaml_exercises)
+
+(generate_opam_files true)
+
+(authors "Hidan0")
+
+(package
+ (name ocaml_exercises)
+ (synopsis "Ocaml exercises")
+ (description "Ocaml exercises for Programming Languages course")
+ (depends ocaml dune))
