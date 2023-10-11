@@ -31,9 +31,16 @@ let is_palindrome str =
   in
   aux 0 (List.length str - 1)
 
-(* === TESTS === *)
-let () = pre_process "Do geese see God?" |> List.iter (fun c -> print_char c)
+let ( -- ) str1 str2 =
+  let rec aux acc = function
+    | [] -> acc
+    | c :: cs ->
+        if String.contains str2 c then aux acc cs else aux (c :: acc) cs
+  in
+  aux [] (str1 |> String.to_seq |> List.of_seq)
+  |> List.rev |> List.to_seq |> String.of_seq
 
+(* === TESTS === *)
 let () =
   assert (
     let str = "Do geese see God?" in
@@ -46,3 +53,5 @@ let () =
   assert (not (is_palindrome "Walter Cazzola"));
   assert (is_palindrome "detartrated");
   assert (is_palindrome "anna")
+
+let () = Printf.printf "\n%s\n" ("Walter Cazzola" -- "abcwxyz")
