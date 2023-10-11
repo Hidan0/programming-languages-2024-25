@@ -55,3 +55,43 @@ let () =
   assert (is_palindrome "anna")
 
 let () = Printf.printf "\n%s\n" ("Walter Cazzola" -- "abcwxyz")
+
+let quicksort lst =
+  let rec aux = function
+    | [] -> []
+    | x :: xs ->
+        let smaller, bigger = List.partition (fun y -> y < x) xs in
+        aux smaller @ [ x ] @ aux bigger
+  in
+  aux lst
+
+let check_anagram to_check from =
+  let to_check =
+    quicksort (to_check |> String.to_seq |> List.of_seq)
+    |> List.to_seq |> String.of_seq
+  in
+  let from =
+    List.map
+      (fun x ->
+        quicksort (x |> String.to_seq |> List.of_seq)
+        |> List.to_seq |> String.of_seq)
+      from
+  in
+  try
+    List.find (fun x -> x = to_check) from |> ignore;
+    true
+  with Not_found -> false
+
+let () =
+  let from =
+    [ "incerta"; "trincea"; "cartine"; "citarne"; "pratesi"; "espatrio" ]
+  in
+  assert (
+    let to_check = "carenti" in
+    check_anagram to_check from);
+  assert (
+    let to_check = "sparite" in
+    check_anagram to_check from);
+  assert (
+    let to_check = "ciao" in
+    check_anagram to_check from = false)
