@@ -10,6 +10,9 @@ Define the following functions/operators on strings:
    of one or more of the strings in the dictionary
 *)
 
+let str_to_clist str = str |> String.to_seq |> List.of_seq
+let clist_to_string lst = lst |> List.to_seq |> String.of_seq
+
 let is_letter c =
   let code = Char.code c in
   (code >= 65 && code <= 90) || (code >= 97 && code <= 122)
@@ -20,7 +23,7 @@ let pre_process str =
     | c :: cs ->
         aux (if is_letter c then Char.lowercase_ascii c :: acc else acc) cs
   in
-  aux [] (str |> String.to_seq |> List.of_seq)
+  aux [] (str_to_clist str)
 
 let is_palindrome str =
   let str = pre_process str in
@@ -37,8 +40,7 @@ let ( -- ) str1 str2 =
     | c :: cs ->
         if String.contains str2 c then aux acc cs else aux (c :: acc) cs
   in
-  aux [] (str1 |> String.to_seq |> List.of_seq)
-  |> List.rev |> List.to_seq |> String.of_seq
+  clist_to_string (List.rev (aux [] (str_to_clist str1)))
 
 (* === TESTS === *)
 let () =
@@ -66,16 +68,9 @@ let quicksort lst =
   aux lst
 
 let check_anagram to_check from =
-  let to_check =
-    quicksort (to_check |> String.to_seq |> List.of_seq)
-    |> List.to_seq |> String.of_seq
-  in
+  let to_check = clist_to_string (quicksort (str_to_clist to_check)) in
   let from =
-    List.map
-      (fun x ->
-        quicksort (x |> String.to_seq |> List.of_seq)
-        |> List.to_seq |> String.of_seq)
-      from
+    List.map (fun x -> clist_to_string (quicksort (str_to_clist x))) from
   in
   try
     List.find (fun x -> x = to_check) from |> ignore;
