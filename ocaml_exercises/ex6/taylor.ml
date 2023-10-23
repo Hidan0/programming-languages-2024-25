@@ -1,12 +1,21 @@
 (* Let's write a module to implement sin x n by using the Taylor's series (where n is the level of approximation, i.e., 1 only one item, 2 two items, 3 three items and so on). Do the same with cosine, tangent, logarithm and so on. *)
 (* https://en.wikipedia.org/wiki/Taylor_series#Tayloronometric_functions *)
 
-let rec pow x = function 0 -> 1 | n -> x * pow x (n - 1)
-let rec fpow x = function 0 -> 1. | n -> x *. fpow x (n - 1)
-let rec fact = function 0. -> 1. | 1. -> 1. | x -> x *. fact (x -. 1.)
-let pi = 3.141592653
+module type TAYLOR = sig
+  val sin : float -> int -> float
+  val cos : float -> int -> float
+  val tan : float -> int -> float
+  val arcsin : float -> int -> float
+  val arccos : float -> int -> float
+  val exp : float -> int -> float
+end
 
-module Taylor = struct
+module Taylor : TAYLOR = struct
+  let rec pow x = function 0 -> 1 | n -> x * pow x (n - 1)
+  let rec fpow x = function 0 -> 1. | n -> x *. fpow x (n - 1)
+  let rec fact = function 0. -> 1. | 1. -> 1. | x -> x *. fact (x -. 1.)
+  let pi = 3.141592653
+
   let rec sin x = function
     | 0 -> x
     | n ->
@@ -57,4 +66,4 @@ Printf.printf "cos OG: %.6f Taylor: %.6f\n" (cos 3.) (Taylor.cos 3. 10);
 Printf.printf "tan OG: %.6f Taylor: %.6f\n" (tan 3.) (Taylor.tan 3. 10);
 Printf.printf "arcsin Taylor: %.6f\n" (Taylor.arcsin 0.5 10);
 Printf.printf "arccos Taylor: %.6f\n" (Taylor.arccos 0.5 10);
-Printf.printf "exp OG: %.6f Taylor: %.6f\n" (exp 3.) (Taylor.exp 3. 17)
+Printf.printf "exp OG: %.6f Taylor: %.6f\n" (exp 3.) (Taylor.exp 3. 19)
