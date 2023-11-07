@@ -1,23 +1,20 @@
-module type Stack = sig
+module type IStack = sig
+  exception Empty
+
   val is_empty : 'a list -> bool
   val push : 'a list -> 'a -> 'a list
-  val peek : 'a list -> 'a option
-  val pop : 'a list -> 'a list option
+  val pop : 'a list -> 'a * 'a list
 end
 
-module SafeStack : Stack = struct
-  (** [SafeStack] is a stack data structure with option types. *)
+module SafeStack : IStack = struct
+  exception Empty
 
-  (** [is_empty stk] returns [true] if [stk] is empty, [false] otherwise. *)
+  (** [is_empty stk] returns [true] if [stk] is empty, otherwise [false]. *)
   let is_empty = function [] -> true | _ -> false
 
-  (** [push stk x] returns [stk] with [x] pushed onto it. *)
+  (** [push stk x] returns [stk] with [x] pushed onto the top of the stack. *)
   let push stk x = x :: stk
 
-  (** [peek stk] returns [None] if [stk] is empty, [Some x] otherwise, where [x] is the element on top. *)
-  let peek = function [] -> None | x :: _ -> Some x
-
-  (** [pop stk] returns [None] if [stk] is empty, [Some stk'] otherwise, where)
-      [stk'] is [stk] with the top element removed. *)
-  let pop = function [] -> None | _ :: tl -> Some tl
+  (** [pop stk] raises [Empty] if [stk] is empty, otherwise [(top, rest)]. *)
+  let pop = function [] -> raise Empty | hd :: tl -> (hd, tl)
 end
