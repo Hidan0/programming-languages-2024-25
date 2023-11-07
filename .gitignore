@@ -1,1 +1,2 @@
 ocaml_exercises/_build/*
+erlang/**/**/*.beam
