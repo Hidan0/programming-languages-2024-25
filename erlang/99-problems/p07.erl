@@ -1,12 +1,17 @@
 -module(p07).
+
 -export([flatten/1]).
 
-inner([H|[]]) -> inner(H);
-inner([H|T]) -> inner(H) ++ inner(T);
-inner(N) -> [N].
+inner([H]) ->
+  inner(H);
+inner([H | T]) ->
+  inner(H) ++ inner(T);
+inner(N) ->
+  [N].
 
 % flatten([1,2,[3,[4,[5,6]]]]) -> inner([1,2,[3,[4,[5,6]]]])
-flatten(Lst) -> inner(Lst).
+flatten(Lst) ->
+  inner(Lst).
 
 % inner([H|T]) = inner([1 | 2,[3,[4,[5,6]]]])
 %   inner(1) ++ inner([2 | [3,[4,[5,6]]]])
