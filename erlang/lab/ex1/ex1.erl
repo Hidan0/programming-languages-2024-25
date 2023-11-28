@@ -1,5 +1,5 @@
 -module(ex1).
--export([is_palindrome/1, is_an_anagram/2]).
+-export([is_palindrome/1, is_an_anagram/2, prime_factors/1, is_proper/1]).
 
 % Define the following functions in Erlang:
 %
@@ -53,3 +53,10 @@ is_an_anagram(Str, Dict) ->
 % ex1:is_an_anagram("sparite", ["incerta", "trincea", "cartine", "citarne", "pratesi", "espatrio"]).
 % true
 
+factors(Num) ->
+  [X || X <- lists:seq(1, Num), Num rem X == 0].
+prime_factors(Num) ->
+  [X || X <- factors(Num), length(factors(X)) == 2].
+
+is_proper(Num) -> 
+  lists:sum(factors(Num)) - Num == Num.
