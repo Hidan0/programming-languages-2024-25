@@ -1,5 +1,5 @@
 -module(ex1).
--export([is_palindrome/1]).
+-export([is_palindrome/1, is_an_anagram/2]).
 
 % Define the following functions in Erlang:
 %
@@ -31,4 +31,25 @@ parse_str([Hd | Tl], Acc) ->
 is_palindrome(Str) ->
   Parsed = parse_str(Str, []),
   Parsed == string:reverse(Parsed).
+
+% ex1:is_palindrome("detartrated").         
+% true
+% ex1:is_palindrome("Do geese see God?").  
+% true
+% ex1:is_palindrome("Rise to vote, sir."). 
+% true
+% ex1:is_palindrome("Hello").              
+% false
+
+is_an_anagram(Str, Dict) ->
+  SortedStr = lists:sort(Str),
+  SortedDict = lists:map(fun(X) -> lists:sort(X) end, Dict),
+  lists:member(SortedStr, SortedDict).
+
+% ex1:is_an_anagram("", ["incerta", "trincea", "cartine", "citarne", "pratesi", "espatrio"]).
+% false
+% ex1:is_an_anagram("carenti", ["incerta", "trincea", "cartine", "citarne", "pratesi", "espatrio"]).
+% true
+% ex1:is_an_anagram("sparite", ["incerta", "trincea", "cartine", "citarne", "pratesi", "espatrio"]).
+% true
 
