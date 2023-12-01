@@ -24,11 +24,7 @@ start(MsgNum, ProcNum, Message) ->
     end
   end,
 
-  Pids = lists:map(
-    fun(_) -> 
-      spawn(Program)
-    end, 
-    lists:seq(1, ProcNum)),
+  Pids = [spawn(Program) || _ <- lists:seq(1, ProcNum)],
 
   lists:foreach(fun (Num) ->
     lists:foreach(fun (Pid) ->
