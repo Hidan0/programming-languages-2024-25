@@ -22,46 +22,39 @@ start(NumbMsg, NumbProc, Msg) ->
     after 5000 -> exit(timeout)
   end,
   msg_dispatcher(NumbMsg, 1, Msg),
-  fst_proc ! stop,
+  fst_proc ! {stop, NumbProc, 1},
   ok.
 
-create(1, Who, Starter) ->
+create(1, ProcLabel, Starter) ->
   Starter ! ready,
-  io:format("*** created [~p] as ~p to ~p~n", [self(), Who, fst_proc]),
-  loop_last(fst_proc, Who);
-create(N, Who, Starter) ->
-  Next = spawn(?MODULE, create, [N-1, Who+1, Starter]),
-  io:format("*** created [~p] as ~p to ~p~n", [self(), Who, Next]),
-  loop(Next, Who).
+  io:format("*** created [~p] as ~p to ~p~n", [self(), ProcLabel, fst_proc]),
+  loop(fst_proc, ProcLabel);
+create(N, ProcLabel, Starter) ->
+  Next = spawn(?MODULE, create, [N-1, ProcLabel+1, Starter]),
+  io:format("*** created [~p] as ~p to ~p~n", [self(), ProcLabel, Next]),
+  loop(Next, ProcLabel).
   
-msg_dispatcher(M, M, Msg) -> fst_proc ! {Msg, M, 1};
-msg_dispatcher(M, N, Msg) -> fst_proc ! {Msg, N, 1}, msg_dispatcher(M, N+1, Msg).
+msg_dispatcher(MsgToDispatch, MsgToDispatch, Msg) -> 
+  fst_proc ! {Msg, MsgToDispatch};
+msg_dispatcher(MsgToDispatch, DispatchedMsg, Msg) -> 
+  fst_proc ! {Msg, DispatchedMsg}, 
+  msg_dispatcher(MsgToDispatch, DispatchedMsg+1, Msg).
 
-loop(Next, Who) -> 
+loop(Next, ProcLbl) -> 
   receive
-    {Msg, N, Pass} ->
-      io:format("[~p] received {~p ~p} for the ~p times~n", [Who, Msg, N, Pass]),
-      Next ! { Msg, N, Pass },
-      io:format("*** [~p] sent ~p to [~p]~n", [Who, Msg, Next]),
-      loop(Next, Who);
-    stop ->
-      io:format("[~p] received Stop ~n", [Who]),
-      Next ! stop,
-      io:format("*** [~p] sent 'stop' to [~p]~n", [Who, Next]),
-      io:format("# [~p] terminated~n", [Who]);
-    Other -> io:format("Houston, we have a problem: ~p~n", [Other])
-  end.
-
-loop_last(Next, Who) -> 
-  receive
-    {Msg, N, Pass} ->
-      io:format("[~p] received {~p ~p} from ~p~n", [Who, Msg, N, Pass]),
-      Next ! { Msg, N, Pass },
-      io:format("*** [~p] sent ~p to [~p]~n", [Who, Msg, Next]),
-      loop(Next, Who);
-    stop ->
-      io:format("[~p] received Stop ~n", [Who]),
-      io:format("# [~p] terminated~n", [Who]),
+    {Msg, N} ->
+      io:format("[~p] received {~p ~p}~n", [ProcLbl, Msg, N]),
+      Next ! { Msg, N },
+      io:format("*** [~p] sent ~p to [~p]~n", [ProcLbl, Msg, Next]),
+      loop(Next, ProcLbl);
+    {stop, NumbProc, CurrProc} when CurrProc < NumbProc ->
+      io:format("[~p] received Stop ~n", [ProcLbl]),
+      Next ! {stop, NumbProc, CurrProc+1},
+      io:format("*** [~p] sent 'stop' to [~p]~n", [ProcLbl, Next]),
+      io:format("# [~p] terminated~n", [ProcLbl]);
+    {stop, _, _} ->
+      io:format("[~p] received Stop ~n", [ProcLbl]),
+      io:format("# [~p] terminated~n", [ProcLbl]),
       exit(normal),
       unregister(fst_proc);
     Other -> io:format("Houston, we have a problem: ~p~n", [Other])
