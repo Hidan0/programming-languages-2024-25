@@ -11,24 +11,24 @@ create(Lbl) ->
   io:format("*** Registered [~p] as ~p in node [~p]~n", [self(), Lbl, node()]),
   loop(Lbl).
 
-loop(Lbl) ->
+loop() ->
   receive
     {store, Key, Value, From} ->
       io:format("*** Storing [~p] <- [~p]~n", [Key, Value]),
       put(Key, Value),
       From ! {store, ok},
-      loop(Lbl);
+      loop();
     {lookup, Key, From} ->
       io:format("*** Looking up [~p]~n", [Key]),
       Value = get(Key),
       From ! {lookup, Value},
-      loop(Lbl);
+      loop();
     {stop, From} ->
       io:format("*** Stopping~n", []),
       From ! {stop, ok};
     Other ->
       io:format("Unknown message: ~p~n", [Other]),
-      loop(Lbl)
+      loop()
   end.
 
 store(Lbl, Key, Value) ->
