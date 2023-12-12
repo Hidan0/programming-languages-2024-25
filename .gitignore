@@ -1,2 +1,3 @@
 ocaml_exercises/_build/*
 erlang/**/**/*.beam
+scala/**/*.class
