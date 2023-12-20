@@ -23,6 +23,10 @@ object Ex1 {
       .map(n => factors(num / n, n, acc :+ n))
       .getOrElse(acc)
   }
+
+  def is_proper(number: Int): Boolean = {
+    ((2 until number).collect { case x if number % x == 0 => x}).sum == number - 1
+  }
 }
 
 object Main extends App {
@@ -52,4 +56,8 @@ object Main extends App {
   List(25, 400, 1970, 42, 7, 32523, 534587)
     .map(num => f"factors(\"$num\") = ${Ex1.factors(num)}\n")
     .foreach(print)
+ 
+  List(6, 7, 28, 41, 496)
+    .map(num => f"is_proper(\"$num\") = ${Ex1.is_proper(num)}\n")
+    .foreach(print)   
 }
