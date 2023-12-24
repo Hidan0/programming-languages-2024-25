@@ -1,3 +1,8 @@
 ocaml_exercises/_build/*
 erlang/**/**/*.beam
-scala/**/*.class
+scala_exercises/**/*.class
+scala_exercises/.vscode
+scala_exercises/.metals
+scala_exercises/.scala-build
+scala_exercises/.scalafmt.conf
+
