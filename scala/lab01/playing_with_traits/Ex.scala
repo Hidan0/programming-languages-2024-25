@@ -1,129 +1,167 @@
 class Editor {
   private var cursorPos: Int = -1
-  private var line: String = ""
+  private var str: String = ""
 
   def x(): Unit = {
-    if (line.isEmpty || cursorPos == -1)
-      return
-
-    if (line.length == cursorPos) {
-      cursorPos -= 1      
-      line = line.slice(0, cursorPos)
+    if (str.isEmpty || cursorPos == -1) {
+      display()
       return
     }
 
-    val (l, r) = line.splitAt(cursorPos-1) 
-    val r1 = r.slice(1, r.length)
-    line = l + r1
+    if (str.length == cursorPos) {
+      cursorPos -= 1      
+      str = str.slice(0, cursorPos)
+    } else {
+      val (l, r) = str.splitAt(cursorPos-1) 
+      val r1 = r.slice(1, r.length)
+      str = l + r1
+    }
+    display()
   }
 
   def dw(): Unit = {
-    if (line.isEmpty || cursorPos == -1)
-      return
-
-    val (l, r) = line.splitAt(cursorPos-1)
-    var idx = r.indexOf(' ', 0)
-    if (idx == -1) {
-      line = l
-      cursorPos = line.length
+    if (str.isEmpty || cursorPos == -1) {
+      display()
       return
     }
-    line = l + r.slice(idx + 1, r.length)
+
+    val (l, r) = str.splitAt(cursorPos-1)
+    var idx = r.indexOf(' ', 0)
+    if (idx == -1) {
+      str = l
+      cursorPos = str.length
+    } else {
+      str = l + r.slice(idx + 1, r.length)
+    }
+    display()
   }
 
   def i(c: Char): Unit = {
     if (cursorPos == -1) {
-      line += c
+      str += c
       cursorPos = 1
-      return
+    } else {
+      val (left, right) = str.splitAt(cursorPos)
+      cursorPos += 1
+      str = left + c + right
     }
-    
-    val (left, right) = line.splitAt(cursorPos)
-    cursorPos += 1
-    line = left + c + right
+    display() 
   }
 
   def iw(word: String): Unit = {
     if (cursorPos == -1) {
-      line += s"$word "
+      str += s"$word "
       cursorPos = word.length + 1
-      return
+    } else {
+      val (left, right) = str.splitAt(cursorPos)
+      val w = s"$word "
+      cursorPos += w.length 
+      str = left + w + right
     }
-    
-    val (left, right) = line.splitAt(cursorPos)
-    val w = s"$word "
-    cursorPos += w.length 
-    line = left + w + right
+    display() 
   }
 
   def l(n: Int = 1): Unit = {
-    if (line.isEmpty) return 
-    cursorPos = if (cursorPos + n > line.length) line.length else cursorPos + n 
+    if (!str.isEmpty) 
+      cursorPos = if (cursorPos + n > str.length) str.length else cursorPos + n 
+    display()
   }
 
   def h(n: Int = 1): Unit = {
-    if (line.isEmpty) return 
-    cursorPos = if (cursorPos - n <= 0) 1 else cursorPos - n
+    if (!str.isEmpty)
+      cursorPos = if (cursorPos - n <= 0) 1 else cursorPos - n
+    display()
   }
 
   def display(): Unit = {
-    if (line.isEmpty) {
-      println("EMPTY")
-      return
-    }
-    println(line)
-    (1 until line.length + 1)
-      .foreach(i => if (i == cursorPos) print("^") else print(" "))
+    println(str)
+  }
+  
+  protected def cursor() = cursorPos
+  protected def line() = str 
+}
+
+trait Debug extends Editor {
+  private var lastLine: String = super.line()
+  private var lastCmd: String = ""
+
+  override def x(): Unit = {
+    lastLine = super.line()
+    lastCmd = "x"
+    super.x()
+  }
+
+  override def dw(): Unit = {
+    lastLine = super.line()
+    lastCmd = "dw"
+    super.dw()
+  }
+
+  override def i(c: Char): Unit = {
+    lastLine = super.line()
+    lastCmd = "i"
+    super.i(c)
+  }
+
+  override def iw(word: String): Unit = {
+    lastLine = super.line()
+    lastCmd = "iw"
+    super.iw(word)
+  }
+
+  override def l(n: Int = 1): Unit = {
+    lastLine = super.line()
+    lastCmd = "l"
+    super.l(n)
+  }
+
+  override def h(n: Int = 1): Unit = {
+    lastLine = super.line()
+    lastCmd = "h"
+    super.h(n)
+  }
+
+  override def display(): Unit = {
+    println(s"[BEFORE] -: \"${lastLine}\"")
+    var db = s"[${lastCmd}] "
+    print(db)
+    super.display()
+    (1 until (db.length + super.line().length + 1))
+      .foreach(i => if (i-db.length == super.cursor()) print("^") else print(" "))
     println()
   }
 }
 
 object Test {
   def main(args: Array[String]): Unit = {
-    val ex = new Editor
-    ex.display()
+    test(new Editor) 
+    test(new Editor with Debug)
+  }
+
+  def test(ex: Editor) = {
     ex i ' '
-    ex.display()
     ex.x()
-    ex.display()
     ex i 'h'
-    ex.display()
     ex iw "ello world"
     ex iw "!! Nice"
-    ex.display()
     ex.h(2)
-    ex.display()
     ex.h(12)
-    ex.display()
     ex.dw()
-    ex.display()
     ex.l()
     ex.l()
-    ex.display()
     ex.x()
-    ex.display()
     ex.l(20)
-    ex.display()
     ex.x()
-    ex.display()
     ex.h(10)
     ex.x()
-    ex.display()
     ex.l()
     ex.dw()
-    ex.display()
     ex.dw()
-    ex.display()
     ex.dw()
-    ex.display()
     ex.h(10)
     ex.dw()
-    ex.display()
     ex iw "Hello world"
-    ex.display()
     ex.h(20)
-    ex.display()
-    ex.dw() 
-    ex.display()
+    ex.dw()
   }
 }
