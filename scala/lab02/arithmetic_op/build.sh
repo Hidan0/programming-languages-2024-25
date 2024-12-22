@@ -15,4 +15,5 @@ scalac \
 
 scala \
   -cp ".:$PARSER_COMBINATORS_JAR" \
-  $MAIN_CLASS
+  $MAIN_CLASS \
+  operations.txt
