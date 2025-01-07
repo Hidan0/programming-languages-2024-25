@@ -4,8 +4,8 @@ class CalculatorParserCombinators extends JavaTokenParsers {
   def expr: Parser[Double] = term ~ rep(("+" | "-") ~ term) ^^ {
     case t ~ list =>
       list.foldLeft(t) {
-        case (acc, "+" ~ x) => acc * x
-        case (acc, "-" ~ x) => acc / x
+        case (acc, "+" ~ x) => acc + x
+        case (acc, "-" ~ x) => acc - x
         case _ => throw new IllegalArgumentException("Invalid expression")
       }
   }
